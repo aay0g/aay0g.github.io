@@ -1,88 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aayog's Terminal</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon"> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aayog's Interactive Terminal</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
-        /* Your @keyframes blink animation should be here, or in a separate CSS file */
+        /* --- General Reset & Body Styles --- */
+        html, body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
+            background: linear-gradient(to bottom, #1a1a1a, #333333);
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* --- Page Container --- */
+        .page-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- Terminal Window --- */
+        .terminal-window {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+        }
+
+        /* --- Terminal Header --- */
+        .terminal-header {
+            background: rgba(40, 40, 40, 0.9);
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        .header-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #ff5f57; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #28ca42; }
+
+        /* --- Terminal Body (Scrollable area) --- */
+        .terminal-body {
+            padding: 24px;
+            font-size: 14px;
+            line-height: 1.8;
+            background: rgba(0,0,0,0.8);
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        /* Custom scrollbar */
+        .terminal-body::-webkit-scrollbar { width: 8px; }
+        .terminal-body::-webkit-scrollbar-track { background: rgba(40, 40, 40, 0.9); }
+        .terminal-body::-webkit-scrollbar-thumb { background-color: #555; border-radius: 4px; border: 2px solid transparent; background-clip: content-box; }
+        .terminal-body::-webkit-scrollbar-thumb:hover { background-color: #777; }
+
+        /* --- Text & Input Styling --- */
+        .command { color: #00ff00; }
+        .output { color: #ffffff; margin-bottom: 20px; }
+        .output-info { color: #4ecdc4; margin-bottom: 20px; }
+        .output-error { color: #ff6b6b; margin-bottom: 20px; }
+        
+        .prompt-line {
+            display: flex;
+            align-items: center;
+        }
+        .prompt { color: #00ff00; margin-right: 8px; }
+
+        /* This is the editable input area */
+        .input-area {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-family: inherit;
+            font-size: inherit;
+            outline: none; /* Removes the focus border */
+        }
+        
+        /* --- Blinking Cursor Animation --- */
+        .cursor {
+            animation: blink 1s step-end infinite;
+            display: inline-block; /* Makes sure it's on the same line */
+            width: 8px; /* Give it a width so it's visible */
+        }
         @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <div style="
-        font-family: 'Courier New', monospace;
-        margin: 0;
-        padding: 0;
-        background: #000000;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-    ">
-        <div style="
-            background: rgba(30, 30, 30, 0.95);
-            border-radius: 12px;
-            padding: 0;
-            max-width: 800px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            overflow: hidden;
-        ">
-            <div style="
-                background: rgba(40, 40, 40, 0.9);
-                padding: 12px 16px;
-                display: flex;
-                gap: 8px;
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-            ">
-                <div style="width: 12px; height: 12px; background: #ff5f57; border-radius: 50%;"></div>
-                <div style="width: 12px; height: 12px; background: #ffbd2e; border-radius: 50%;"></div>
-                <div style="width: 12px; height: 12px; background: #28ca42; border-radius: 50%;"></div>
+
+    <div class="page-container">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="header-dot dot-red"></div>
+                <div class="header-dot dot-yellow"></div>
+                <div class="header-dot dot-green"></div>
             </div>
 
-            <div style="
-                padding: 24px;
-                font-size: 14px;
-                line-height: 1.8;
-                background: rgba(0,0,0,0.8);
-            ">
-                <div style="color: #00ff00; margin-bottom: 12px;">$ whoami</div>
-                <div style="color: #ffffff; margin-bottom: 24px;">aayog@technologist:~$</div>
-
-                <div style="color: #00ff00; margin-bottom: 12px;">$ cat mission.txt</div>
-                <div style="color: #4ecdc4; margin-bottom: 24px;">
-                    "Solving problems at the intersection of<br>
-                    cybersecurity, financial fraud, and<br>
-                    AI-human interaction"
-                </div>
-
-                <div style="color: #00ff00; margin-bottom: 12px;">$ python3 solve_world_problems.py</div>
-                <div style="color: #ff6b6b; margin-bottom: 24px;">
-                    Loading innovative solutions...<br>
-                    <span style="animation: blink 1s infinite;">█</span>
-                </div>
-
-                <div style="color: #00ff00; margin-bottom: 12px;">$ ls -la skills/</div>
-                <div style="color: #ffffff; margin-bottom: 24px;">
-                    drwxr-xr-x  cybersecurity/<br>
-                    drwxr-xr-x  fraud-detection/<br>
-                    drwxr-xr-x  ai-integration/<br>
-                    drwxr-xr-x  entrepreneurship/<br>
-                    drwxr-xr-x  problem-solving/
-                </div>
-
-                <div style="color: #00ff00; margin-bottom: 12px;">$ echo "Hello, World!"</div>
-                <div style="color: #ffffff; margin-bottom: 24px;">Hello, World!</div>
-
-                <div style="color: #00ff00;">$ <span style="animation: blink 1s infinite;">█</span></div>
+            <div class="terminal-body" id="terminalBody">
+                <!-- Initial content is now generated by JavaScript for consistency -->
             </div>
         </div>
     </div>
+
+<script>
+    const terminalBody = document.getElementById('terminalBody');
+    const commands = {
+        'whoami': 'aayog@technologist:~$',
+        'mission': `
+            <div class="output-info">
+                "Solving problems at the intersection of<br>
+                cybersecurity, financial fraud, and<br>
+                AI-human interaction"
+            </div>`,
+        'skills': `
+            <div class="output">
+                drwxr-xr-x  cybersecurity/<br>
+                drwxr-xr-x  fraud-detection/<br>
+                drwxr-xr-x  ai-integration/<br>
+                drwxr-xr-x  entrepreneurship/<br>
+                drwxr-xr-x  problem-solving/
+            </div>`,
+        'projects': `
+            <div class="output">
+                [Project 1: AI-Powered Phishing Detector]<br>
+                [Project 2: Anomaly Detection in Transactions]<br>
+                [Project 3: Secure Chat Application]
+            </div>`,
+        'help': `
+            <div class="output">
+                Available commands:<br>
+                <span class="command">whoami</span>   - Displays user information<br>
+                <span class="command">mission</span>  - Shows the mission statement<br>
+                <span class="command">skills</span>   - Lists key skill areas<br>
+                <span class="command">projects</span> - Shows a list of projects<br>
+                <span class="command">date</span>     - Displays the current date<br>
+                <span class="command">clear</span>    - Clears the terminal screen<br>
+                <span class="command">help</span>     - Shows this help message
+            </div>`,
+        'date': new Date().toLocaleString(),
+    };
+
+    function processCommand(command) {
+        if (command.toLowerCase() === 'clear') {
+            terminalBody.innerHTML = '';
+            return;
+        }
+
+        const output = commands[command.toLowerCase()] || `<div class="output-error">Command not found: ${command}. Type 'help' for a list of commands.</div>`;
+        
+        // Use a wrapper div to ensure proper margin on direct string outputs
+        const outputHtml = (output.trim().startsWith('<div')) ? output : `<div class="output">${output}</div>`;
+        terminalBody.insertAdjacentHTML('beforeend', outputHtml);
+    }
+
+    function createNewInputLine() {
+        // Create the new input line structure
+        const line = document.createElement('div');
+        line.className = 'prompt-line';
+        line.innerHTML = `
+            <span class="prompt">$</span>
+            <input type="text" class="input-area" autofocus />
+        `;
+        terminalBody.appendChild(line);
+
+        const input = line.querySelector('.input-area');
+        input.focus();
+
+        // Add event listener for the 'Enter' key
+        input.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const command = input.value.trim();
+
+                // Make the current line static
+                const commandEntered = document.createElement('div');
+                commandEntered.className = 'command';
+                commandEntered.innerHTML = `$ ${command}`;
+                
+                // Replace the input line with the static command
+                line.parentNode.replaceChild(commandEntered, line);
+
+                // Process the command and display output
+                if (command) {
+                    processCommand(command);
+                }
+
+                // Create a new input line for the next command
+                createNewInputLine();
+                
+                // Scroll to the bottom
+                terminalBody.scrollTop = terminalBody.scrollHeight;
+            }
+        });
+    }
+    
+    // Initial greeting and first input line
+    function initTerminal() {
+        terminalBody.innerHTML = `
+            <div class="output">Welcome to Aayog's Interactive Terminal!</div>
+            <div class="output">Type <span class="command">'help'</span> to see a list of available commands.</div>
+        `;
+        createNewInputLine();
+    }
+    
+    initTerminal();
+
+</script>
+
 </body>
 </html>
