@@ -6,108 +6,100 @@
     <title>Aayog's Interactive Terminal</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
-        /* --- General Reset & Body Styles --- */
-        html, body {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Courier New', Courier, monospace;
-            background: linear-gradient(to bottom, #1a1a1a, #333333);
-            color: white;
-            min-height: 100vh;
-        }
+    /* --- General Reset & Body Styles --- */
+    html, body {
+        margin: 0; padding: 0; box-sizing: border-box;
+        font-family: 'Courier New', Courier, monospace;
+        background: linear-gradient(to bottom, #1a1a1a, #333333);
+        color: white; min-height: 100vh;
+    }
 
-        /* --- Page Container --- */
-        .page-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+    /* --- Page Container --- */
+    .page-container {
+        display: flex; align-items: center; justify-content: center;
+        min-height: 100vh; padding: 20px;
+    }
 
-        /* --- Terminal Window --- */
-        .terminal-window {
-            background: rgba(30, 30, 30, 0.95);
-            border-radius: 12px;
-            max-width: 800px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            max-height: 90vh;
-        }
+    /* --- Terminal Window --- */
+    .terminal-window {
+        background: rgba(30, 30, 30, 0.95); border-radius: 12px;
+        max-width: 800px; width: 100%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        border: 1px solid rgba(255,255,255,0.1);
+        overflow: hidden; display: flex; flex-direction: column;
+        max-height: 90vh;
+    }
 
-        /* --- Terminal Header --- */
-        .terminal-header {
-            background: rgba(40, 40, 40, 0.9);
-            padding: 12px 16px;
-            display: flex;
-            gap: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            flex-shrink: 0;
-        }
+    /* --- Terminal Header --- */
+    .terminal-header {
+        background: rgba(40, 40, 40, 0.9); padding: 12px 16px;
+        display: flex; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);
+        flex-shrink: 0;
+    }
+    .header-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red { background: #ff5f57; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #28ca42; }
 
-        .header-dot { width: 12px; height: 12px; border-radius: 50%; }
-        .dot-red { background: #ff5f57; }
-        .dot-yellow { background: #ffbd2e; }
-        .dot-green { background: #28ca42; }
+    /* --- Terminal Body (Scrollable area) --- */
+    .terminal-body {
+        padding: 24px; font-size: 14px; line-height: 1.8;
+        background: rgba(0,0,0,0.8); overflow-y: auto; flex-grow: 1; cursor: text;
+    }
+    .terminal-body::-webkit-scrollbar { width: 8px; }
+    .terminal-body::-webkit-scrollbar-track { background: rgba(40, 40, 40, 0.9); }
+    .terminal-body::-webkit-scrollbar-thumb { background-color: #555; border-radius: 4px; border: 2px solid transparent; background-clip: content-box; }
 
-        /* --- Terminal Body (Scrollable area) --- */
+    /* --- Text, Input & Link Styling --- */
+    .command { color: #00ff00; }
+    .output { color: #ffffff; margin-bottom: 20px; white-space: pre-wrap; word-break: break-word; } /* Added word-break */
+    .output-info { color: #4ecdc4; margin-bottom: 20px; }
+    .output-error { color: #ff6b6b; margin-bottom: 20px; }
+    .output a { color: #7ab3ff; text-decoration: none; }
+    .output a:hover { text-decoration: underline; }
+    
+    .prompt-line { display: flex; align-items: center; }
+    .prompt { color: #00ff00; margin-right: 8px; }
+    .input-area {
+        flex-grow: 1; background: transparent; border: none;
+        color: white; font-family: inherit; font-size: inherit;
+        outline: none;
+    }
+    
+    /* --- Responsive Helper Classes --- */
+    .neofetch-container { display: flex; gap: 20px; }
+    .neofetch-container pre { margin: 0; }
+    
+    .help-grid {
+        display: grid;
+        grid-template-columns: auto 1fr; /* First column sized to content, second takes the rest */
+        gap: 5px 15px; /* 5px row gap, 15px column gap */
+    }
+
+    /* --- MOBILE RESPONSIVENESS --- */
+    @media (max-width: 600px) {
         .terminal-body {
-            padding: 24px;
-            font-size: 14px;
-            line-height: 1.8;
-            background: rgba(0,0,0,0.8);
-            overflow-y: auto;
-            flex-grow: 1;
+            padding: 15px; /* Reduce padding on mobile */
+            font-size: 12px; /* Slightly smaller font for more space */
         }
-        
-        /* Custom scrollbar */
-        .terminal-body::-webkit-scrollbar { width: 8px; }
-        .terminal-body::-webkit-scrollbar-track { background: rgba(40, 40, 40, 0.9); }
-        .terminal-body::-webkit-scrollbar-thumb { background-color: #555; border-radius: 4px; border: 2px solid transparent; background-clip: content-box; }
-        .terminal-body::-webkit-scrollbar-thumb:hover { background-color: #777; }
 
-        /* --- Text & Input Styling --- */
-        .command { color: #00ff00; }
-        .output { color: #ffffff; margin-bottom: 20px; }
-        .output-info { color: #4ecdc4; margin-bottom: 20px; }
-        .output-error { color: #ff6b6b; margin-bottom: 20px; }
-        
-        .prompt-line {
-            display: flex;
-            align-items: center;
+        .neofetch-container {
+            flex-direction: column; /* Stack ASCII art and text vertically */
+            gap: 10px;
         }
-        .prompt { color: #00ff00; margin-right: 8px; }
 
-        /* This is the editable input area */
-        .input-area {
-            flex-grow: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-family: inherit;
-            font-size: inherit;
-            outline: none; /* Removes the focus border */
+        .help-grid {
+            grid-template-columns: 1fr; /* Make help a single column */
+            gap: 10px;
         }
-        
-        /* --- Blinking Cursor Animation --- */
-        .cursor {
-            animation: blink 1s step-end infinite;
-            display: inline-block; /* Makes sure it's on the same line */
-            width: 8px; /* Give it a width so it's visible */
+
+        /* Indent the help description on mobile for readability */
+        .help-grid .help-description {
+            padding-left: 15px;
         }
-        @keyframes blink {
-            from, to { opacity: 1; }
-            50% { opacity: 0; }
-        }
-    </style>
-</head>
+    }
+</style></head>
 <body>
-
     <div class="page-container">
         <div class="terminal-window">
             <div class="terminal-header">
@@ -115,115 +107,170 @@
                 <div class="header-dot dot-yellow"></div>
                 <div class="header-dot dot-green"></div>
             </div>
-
             <div class="terminal-body" id="terminalBody">
-                <!-- Initial content is now generated by JavaScript for consistency -->
+                <!-- Content generated by JavaScript -->
             </div>
         </div>
     </div>
 
 <script>
     const terminalBody = document.getElementById('terminalBody');
+    const commandHistory = [];
+    let historyIndex = -1;
+
+    // --- Command structure is now more powerful ---
     const commands = {
-        'whoami': 'aayog@technologist:~$',
-        'mission': `
-            <div class="output-info">
-                "Solving problems at the intersection of<br>
-                cybersecurity, financial fraud, and<br>
-                AI-human interaction"
-            </div>`,
-        'skills': `
-            <div class="output">
-                drwxr-xr-x  cybersecurity/<br>
-                drwxr-xr-x  fraud-detection/<br>
-                drwxr-xr-x  ai-human-interaction/<br>
-                drwxr-xr-x  spatial-computing/<br>
-                drwxr-xr-x  3d-world-models/
-            </div>`,
-        'projects': `
-            <div class="output">
-                <a href="https://github.com/aay0g" target="_blank" class="command">Visit GitHub</a> - My projects and contributions<br>
-            </div>`,
-        'help': `
-            <div class="output">
-                Available commands:<br>
-                <span class="command">whoami</span>   - Displays user information<br>
-                <span class="command">mission</span>  - Shows the mission statement<br>
-                <span class="command">skills</span>   - Lists key skill areas<br>
-                <span class="command">projects</span> - Shows a list of projects<br>
-                <span class="command">date</span>     - Displays the current date<br>
-                <span class="command">clear</span>    - Clears the terminal screen<br>
-                <span class="command">help</span>     - Shows this help message
-            </div>`,
-        'date': new Date().toLocaleString(),
-    };
-
-    function processCommand(command) {
-        if (command.toLowerCase() === 'clear') {
-            terminalBody.innerHTML = '';
-            return;
+        'neofetch': {
+            description: 'Displays a summary of Aayog.',
+            execute: () => `
+<div class="neofetch-container">
+<pre style="color: #4ecdc4; margin-bottom: 0;">
+          ,MMM888&&&.
+    _...MMMMM88888&&&&..._
+ .::'''MMMMM88888&&&&&&'''::.
+::     MMMMM88888&&&&&&     ::
+'::....MMMMM88888&&&&&&....::'
+   \`''''MMMMM8888&&&&''''\`
+   jgs   'MMM888&&&'
+</pre>
+<div>
+<b>Aayog's Interactive Terminal</b>
+---------------------------
+<b>Mission</b>: Cybersecurity, AI & Finance
+<b>Skills</b>: Type <span class="command">skills</span>
+<b>Projects</b>: Type <span class="command">projects</span>
+<b>Contact</b>: Type <span class="command">socials</span>
+</div></div>`
+        },
+        'whoami': {
+            description: 'Displays user information.',
+            execute: () => 'aayog@technologist:~$'
+        },
+        'mission': {
+            description: 'Shows the mission statement.',
+            execute: () => `<div class="output-info">"Solving problems at the intersection of<br>cybersecurity, financial fraud, and<br>AI-human interaction"</div>`
+        },
+        'skills': {
+            description: 'Lists key skill areas.',
+            execute: () => `drwxr-xr-x  cybersecurity/<br>drwxr-xr-x  fraud-detection/<br>drwxr-xr-x  ai-human-interaction/<br>drwxr-xr-x  spatial-computing/<br>drwxr-xr-x  3d-world-models/`
+        },
+        'projects': {
+            description: 'Shows links to projects.',
+            execute: () => `View my work on <a href="https://github.com/aay0g" target="_blank">GitHub</a>.`
+        },
+        'socials': {
+            description: 'Displays social media links.',
+            execute: () => `Find me on:<br><a href="https://linkedin.com/in/aayog-yadav" target="_blank">LinkedIn</a><br><a href="https://x.com/aayogyadav128" target="_blank">Twitter / X</a><br><a href="https://instagram.com/aayog.in" target="_blank">Instagram</a>`
+        },
+        'date': {
+            description: 'Displays the current date and time.',
+            execute: () => new Date().toLocaleString()
+        },
+        'echo': {
+            description: 'Prints the provided text. Usage: echo [text]',
+            execute: (args) => args.join(' ')
+        },
+        'clear': {
+            description: 'Clears the terminal screen.',
+            execute: () => {
+                terminalBody.innerHTML = '';
+                return ''; // Return empty string
+            }
+        },
+        'help': {
+            description: 'Shows this help message.',
+            execute: () => {
+                // Now uses the responsive .help-grid class
+                let helpText = 'Available commands:<br><div class="help-grid">';
+                for (const cmd in commands) {
+                    helpText += `
+                        <div><span class="command">${cmd}</span></div>
+                        <div class="help-description">- ${commands[cmd].description}</div>
+                    `;
+                }
+                helpText += '</div>';
+                return helpText;
+            }
         }
+    };
+    
+    // The rest of the JavaScript functions (processCommand, createNewInputLine, etc.)
+    // can remain exactly the same as in the previous version. I'm including them
+    // here for completeness.
 
-        const output = commands[command.toLowerCase()] || `<div class="output-error">Command not found: ${command}. Type 'help' for a list of commands.</div>`;
-        
-        // Use a wrapper div to ensure proper margin on direct string outputs
-        const outputHtml = (output.trim().startsWith('<div')) ? output : `<div class="output">${output}</div>`;
-        terminalBody.insertAdjacentHTML('beforeend', outputHtml);
+    function processCommand(fullCommand) {
+        const [commandName, ...args] = fullCommand.split(/\s+/);
+        const command = commands[commandName.toLowerCase()];
+
+        if (command) {
+            const output = command.execute(args);
+            if (output) {
+                terminalBody.insertAdjacentHTML('beforeend', `<div class="output">${output}</div>`);
+            }
+        } else {
+            terminalBody.insertAdjacentHTML('beforeend', `<div class="output-error">Command not found: ${commandName}. Type 'help' for a list of commands.</div>`);
+        }
+        terminalBody.scrollTop = terminalBody.scrollHeight;
     }
 
     function createNewInputLine() {
-        // Create the new input line structure
         const line = document.createElement('div');
         line.className = 'prompt-line';
-        line.innerHTML = `
-            <span class="prompt">$</span>
-            <input type="text" class="input-area" autofocus />
-        `;
+        line.innerHTML = `<span class="prompt">$</span><input type="text" class="input-area" autofocus />`;
         terminalBody.appendChild(line);
 
         const input = line.querySelector('.input-area');
         input.focus();
 
-        // Add event listener for the 'Enter' key
-        input.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && input.value.trim() !== '') {
                 event.preventDefault();
-                const command = input.value.trim();
+                const fullCommand = input.value.trim();
+                
+                commandHistory.push(fullCommand);
+                historyIndex = commandHistory.length;
 
-                // Make the current line static
                 const commandEntered = document.createElement('div');
                 commandEntered.className = 'command';
-                commandEntered.innerHTML = `$ ${command}`;
-                
-                // Replace the input line with the static command
+                commandEntered.innerHTML = `$ ${fullCommand}`;
                 line.parentNode.replaceChild(commandEntered, line);
 
-                // Process the command and display output
-                if (command) {
-                    processCommand(command);
-                }
-
-                // Create a new input line for the next command
+                processCommand(fullCommand);
                 createNewInputLine();
-                
-                // Scroll to the bottom
-                terminalBody.scrollTop = terminalBody.scrollHeight;
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    input.value = commandHistory[historyIndex];
+                    input.setSelectionRange(input.value.length, input.value.length);
+                }
+            } else if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    input.value = commandHistory[historyIndex];
+                } else if (historyIndex === commandHistory.length - 1) {
+                    historyIndex++;
+                    input.value = '';
+                }
             }
         });
     }
     
-    // Initial greeting and first input line
+    terminalBody.addEventListener('click', () => {
+        const input = terminalBody.querySelector('.input-area');
+        if (input) {
+            input.focus();
+        }
+    });
+
     function initTerminal() {
-        terminalBody.innerHTML = `
-            <div class="output">Welcome to Aayog's Interactive Terminal!</div>
-            <div class="output">Type <span class="command">'help'</span> to see a list of available commands.</div>
-        `;
+        terminalBody.insertAdjacentHTML('beforeend', `<div class="output">${commands.neofetch.execute()}</div>`);
+        terminalBody.insertAdjacentHTML('beforeend', `<div class="output">Welcome to Aayog's Interactive Terminal! Type <span class="command">'help'</span> for commands.</div>`);
         createNewInputLine();
     }
     
     initTerminal();
-
 </script>
-
 </body>
 </html>
